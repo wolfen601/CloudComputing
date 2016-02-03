@@ -4,6 +4,7 @@
    "author": "Kevin Ho",
    "dependencies" : {
       "express": "4.x",
-      "socket.io": "*"
+      "socket.io": "*",
+      "bootstrap": "*"
    }
 }

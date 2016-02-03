@@ -19,7 +19,10 @@ io.on('connection', function (socket) {
      line_history.push(data.line);
      io.emit('draw_line', { line: data.line });
   });
-  socket.on('erase', function(data){
-    io.emit('erase', { id: data.id});
+  socket.on('clear', function(data){
+    io.emit('clear', { id: data.id});
+  });
+  socket.on('colorpick', function(data){
+    io.emit('colorpick', { id: data.id});
   });
 });

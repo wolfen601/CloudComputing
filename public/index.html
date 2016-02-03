@@ -7,10 +7,17 @@
       <script src="socket.io/socket.io.js"></script>
       <script src="client.js"></script>
    </head>
+   <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+   <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
    <body>
       <canvas id="drawing"></canvas>
-      <button id="save">Save</canvas>
-
-      <button id="erase">Erase</canvas>
+      <h1>Scribbel
+        <small>Anyone can draw and save!</small>
+      </h1>
+      <div>
+        <button id="colorpicker" class="btn btn-info">Random Color</button>
+        <button id="save" class="btn btn-success">Save</button>
+        <button id="clear" class="btn btn-danger">Clear</button>
+      </div>
    </body>
 </html>

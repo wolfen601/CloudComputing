@@ -8,15 +8,20 @@ document.addEventListener("DOMContentLoaded", function() {
    // get canvas element and create context
    var canvas  = document.getElementById('drawing');
    var context = canvas.getContext('2d');
-   var width   = 720;
+   var width   = window.innerWidth-10;
    var height  = 720;
    var socket  = io.connect();
 
-   var eraser = document.getElementById('erase');
-   var erased = false;
+   //color picker
+   var colorPicker = document.getElementById('colorpicker');
+   var picked = false;
+   var color = "#FF0000";
 
+   //eraser
+   var clear = document.getElementById('clear');
+   var cleared = false;
+   //save
    var save = document.getElementById('save');
-   var saved = false;
 
    // set canvas to full browser width/height
    canvas.width = width;
@@ -38,14 +43,29 @@ document.addEventListener("DOMContentLoaded", function() {
       mouse.move = true;
    };
 
-   eraser.onclick = function(){ erased = true; };
+   clear.onclick = function(){ cleared = true; };
 
    save.onclick = function() {
-     alert('hello');
      var canvas = document.getElementById("drawing");
      var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
      window.location.href=image;
    };
+
+   colorPicker.onclick = function(){
+     picked = true;
+     var canvas  = document.getElementById('drawing');
+     var context = canvas.getContext('2d');
+     var randomColor;
+     randomColor = Math.random() * 0x1000000; // 0 < randomColor < 0x1000000
+     randomColor = Math.floor(randomColor); // 0 < randomColor <= 0xFFFFFF
+     randomColor = randomColor.toString(16); // hex representation randomColor
+     randomColor = ("000000" + randomColor).slice(-6); // leading zeros added
+     randomColor = "#" + randomColor; // # added
+     context.strokeStyle=randomColor;
+     color = randomColor;
+   }
+
+   //SOCKETS
 
    // draw line received from server
 	socket.on('draw_line', function (data) {
@@ -55,21 +75,30 @@ document.addEventListener("DOMContentLoaded", function() {
       context.lineTo(line[1].x * width, line[1].y * height);
       context.stroke();
    });
-
-   socket.on('erase', function (data) {
+   //clear screen
+   socket.on('clear', function (data) {
       var canvas  = document.getElementById('drawing');
       var context = canvas.getContext('2d');
       context.clearRect(0, 0, canvas.width, canvas.height);
     });
+    //random color picker
+    socket.on('colorpick', function (data) {
+       var canvas  = document.getElementById('drawing');
+       var context = canvas.getContext('2d');
+       context.strokeStyle=data.id;
+     });
 
    // main loop, running every 25ms
    function mainLoop() {
 
-     if(erased == true){
-       erased = false;
-       socket.emit('erase', {id: 'erase'});
+     if(cleared == true){
+       cleared = false;
+       socket.emit('clear', {id: 'clear'});
      }
-
+     if(picked == true){
+       picked = false;
+       socket.emit('colorpick', {id: color});
+     }
       // check if the user is drawing
       if (mouse.click && mouse.move && mouse.pos_prev) {
          // send line to to the server
