@@ -1,0 +1,9 @@
+{
+   "name": "Scribbel",
+   "description": "Drawing for fun",
+   "author": "Kevin Ho",
+   "dependencies" : {
+      "express": "4.x",
+      "socket.io": "*"
+   }
+}
