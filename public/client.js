@@ -6,10 +6,14 @@ document.addEventListener("DOMContentLoaded", function() {
       pos_prev: false
    };
    // get canvas element and create context
+   var chatWndw  = document.getElementById('chat');
    var canvas  = document.getElementById('drawing');
    var context = canvas.getContext('2d');
-   var width   = window.innerWidth-10;
-   var height  = 720;
+   var messageWindow = document.getElementById('messageWindow');
+   messageWindow.style.display = 'none';
+   var canvasWidth   = window.innerWidth*(2/3) || 720;
+   var canvasHeight  = 720;
+   var chatWidth   = window.innerWidth*(1/3) || 240;
    var socket  = io.connect();
 
    //color picker
@@ -23,10 +27,20 @@ document.addEventListener("DOMContentLoaded", function() {
    //save
    var save = document.getElementById('save');
 
-   // set canvas to full browser width/height
-   canvas.width = width;
-   canvas.height = height;
-   canvas.style.border = '2px solid #73AD21;'
+   //login
+   var login = document.getElementById('enter');
+   var loginSuccess = false;
+   var name = document.getElementById('name');
+   var username = "";
+
+   //chat
+   var send = document.getElementById('send');
+   var sent = false;
+
+   //width/height
+   canvas.width = canvasWidth;
+   canvas.height = canvasHeight;
+   chatWndw.width = chatWidth;
 
    //color
    context.lineWidth = 2;
@@ -38,11 +52,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
    canvas.onmousemove = function(e) {
       // normalize mouse position to range 0.0 - 1.0
-      mouse.pos.x = e.clientX / width;
-      mouse.pos.y = e.clientY / height;
+      mouse.pos.x = e.clientX / canvasWidth;
+      mouse.pos.y = e.clientY / canvasHeight;
       mouse.move = true;
    };
 
+   //ON CLICKS
    clear.onclick = function(){ cleared = true; };
 
    save.onclick = function() {
@@ -63,31 +78,86 @@ document.addEventListener("DOMContentLoaded", function() {
      randomColor = "#" + randomColor; // # added
      context.strokeStyle=randomColor;
      color = randomColor;
-   }
+   };
+
+   enter.onclick = function(){
+     username = name.value;
+     if(username == ""){
+        alert("Name invalid");
+     }else{
+       loginSuccess = true;
+     }
+   };
+
+   send.onclick = function(){ sent = true;};
 
    //SOCKETS
 
-   // draw line received from server
-	socket.on('draw_line', function (data) {
-      var line = data.line;
-      context.beginPath();
-      context.moveTo(line[0].x * width, line[0].y * height);
-      context.lineTo(line[1].x * width, line[1].y * height);
-      context.strokeStyle=line[2];
-      context.stroke();
-   });
-   //clear screen
-   socket.on('clear', function (data) {
+     // draw line received from server
+  	socket.on('drawLine', function (data) {
+        var line = data.line;
+        context.beginPath();
+        context.moveTo(line[0].x * canvasWidth, line[0].y * canvasHeight);
+        context.lineTo(line[1].x * canvasWidth, line[1].y * canvasHeight);
+        context.strokeStyle=line[2];
+        context.stroke();
+    });
+    //clear screen
+    socket.on('clear', function (data) {
       var canvas  = document.getElementById('drawing');
       var context = canvas.getContext('2d');
       context.clearRect(0, 0, canvas.width, canvas.height);
     });
     //random color picker
-    socket.on('colorpick', function (data) {
-       var canvas  = document.getElementById('drawing');
-       var context = canvas.getContext('2d');
-       context.strokeStyle=data.id;
-     });
+    socket.on('colorPick', function (data) {
+     var canvas  = document.getElementById('drawing');
+     var context = canvas.getContext('2d');
+     context.strokeStyle=data.id;
+    });
+    //new user
+    socket.on('login', function(data){
+      createMessage(0,data.id, "");
+    });
+    //show message
+    socket.on('showMessage', function(data){
+      createMessage(1,data.message[0], data.message[1]);
+    });
+
+    function createMessage(id, user, msg){
+      //check if login or message
+      if(id == 0){
+        //login
+        var chat = document.createElement("li");
+
+        var newMsg = document.createElement("P");
+        var bold = document.createElement("b");
+        var text = document.createTextNode(user + " has logged in.");
+        newMsg.appendChild(bold);
+        newMsg.appendChild(text);
+        chat.appendChild(newMsg);
+        document.getElementById("chats").appendChild(chat);
+      }else if(id == 1){
+        //message
+        var chat = document.createElement("li");
+
+        var character = document.createElement("div");
+        var bold = document.createElement("b");
+        var chrName = document.createTextNode(user + " : ");
+        character.appendChild(bold);
+        character.appendChild(chrName);
+
+        var newMsg = document.createElement("P");
+        var text = document.createTextNode(" " + msg);
+        newMsg.appendChild(text);
+
+        chat.appendChild(character);
+        chat.appendChild(newMsg);
+        document.getElementById("chats").appendChild(chat);
+      }
+      $('#chatWindow').stop().animate({
+        scrollTop: $("#chatWindow")[0].scrollHeight
+      }, 800);
+    }
 
    // main loop, running every 25ms
    function mainLoop() {
@@ -98,12 +168,26 @@ document.addEventListener("DOMContentLoaded", function() {
      }
      if(picked == true){
        picked = false;
-       socket.emit('colorpick', {id: color});
+       socket.emit('colorPick', {id: color});
+     }
+     if(loginSuccess == true){
+       loginSuccess = false;
+       var messageWindow = document.getElementById('messageWindow');
+       messageWindow.style.display = 'block';
+       var loginScreen = document.getElementById('loginScreen');
+       loginScreen.style.display = 'none';
+       socket.emit('login', {id: username});
+     }
+     if(sent == true){
+       sent = false;
+       var messageContent = document.getElementById('message');
+       var msg = messageContent.value;
+       socket.emit('sendMessage', { message: [ username, msg ] });
      }
       // check if the user is drawing
       if (mouse.click && mouse.move && mouse.pos_prev) {
          // send line to to the server
-         socket.emit('draw_line', { line: [ mouse.pos, mouse.pos_prev, color ] });
+         socket.emit('drawLine', { line: [ mouse.pos, mouse.pos_prev, color ] });
          mouse.move = false;
       }
       mouse.pos_prev = {x: mouse.pos.x, y: mouse.pos.y};
