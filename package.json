@@ -1,10 +1,26 @@
 {
-   "name": "Scribbel",
-   "description": "Drawing for fun",
-   "author": "Kevin Ho",
-   "dependencies" : {
-      "express": "4.x",
-      "socket.io": "*",
-      "bootstrap": "*"
-   }
+  "name": "Scribbel",
+  "version": "1.0.0",
+  "description": "Draw together!",
+  "main": "server.js",
+  "dependencies": {
+    "bootstrap": "^3.3.6",
+    "socket.io": "^1.4.5",
+    "express": "^4.13.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wolfen601/CloudComputing.git"
+  },
+  "author": "Kevichino",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wolfen601/CloudComputing/issues"
+  },
+  "homepage": "https://github.com/wolfen601/CloudComputing"
 }
