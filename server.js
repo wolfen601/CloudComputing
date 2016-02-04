@@ -5,9 +5,10 @@ var express = require('express'),
 
 var server = http.createServer(app);
 var io = socketIo.listen(server);
-server.listen(8080);
+var port = process.env.PORT || 8080;
+server.listen(port);
 app.use(express.static(__dirname + '/public'));
-console.log("Server running on 127.0.0.1:37036");
+console.log("Server running on 127.0.0.1:" + port);
 
 var line_history = [];
 
