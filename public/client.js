@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", function() {
    var cleared = false;
    //save
    var save = document.getElementById('save');
+   var saved = false;
 
    //login
    var login = document.getElementById('enter');
@@ -61,6 +62,7 @@ document.addEventListener("DOMContentLoaded", function() {
    clear.onclick = function(){ cleared = true; };
 
    save.onclick = function() {
+     saved = true;
      var canvas = document.getElementById("drawing");
      var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
      window.location.href=image;
@@ -169,6 +171,10 @@ document.addEventListener("DOMContentLoaded", function() {
      if(picked == true){
        picked = false;
        socket.emit('colorPick', {id: color});
+     }
+     if(saved == true){
+       saved = false;
+       socket.emit('save', {image: canvas.toDataURL("image/png")});
      }
      if(loginSuccess == true){
        loginSuccess = false;

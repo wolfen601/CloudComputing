@@ -1,17 +1,32 @@
 var express = require('express'),
     app = express(),
     http = require('http'),
-    socketIo = require('socket.io');
+    socketIo = require('socket.io'),
+    aws = require('aws-sdk');
 
 var server = http.createServer(app);
 var io = socketIo.listen(server);
 var port = process.env.PORT || 8080;
+var accessKeyId =  process.env.AWS_ACCESS_KEY || "AKIAI5F5H7SX4T2D7P3Q";
+var secretAccessKey = process.env.AWS_SECRET_KEY || "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";
+var s3bucket = process.env.S3_BUCKET || "kevichino-cloud-computing";
+
+
+aws.config.update({
+    accessKeyId: accessKeyId,
+    secretAccessKey: secretAccessKey
+});
+var s3 = new aws.S3({
+      params: {Bucket: s3bucket}
+});
+
 server.listen(port);
 app.use(express.static(__dirname + '/public'));
 console.log("Server running on 127.0.0.1:" + port);
 
 var lineHistory = [];
 var messageHistory = [];
+var counter = 0;
 
 io.on('connection', function (socket) {
   for (var i in lineHistory) {
@@ -28,6 +43,21 @@ io.on('connection', function (socket) {
     lineHistory = [];
     messageHistory = [];
     io.emit('clear', { id: data.id });
+  });
+  socket.on('save', function(data){
+    var params = {
+      Key: "image" + counter + ".png",
+      Body: data.image,
+      ContentType: 'image/png',
+      ACL: 'public-read'
+    };
+    s3.putObject(params, function(errBucket, dataBucket) {
+      if (errBucket) {
+        console.log("Error uploading data: ", errBucket);
+      } else {
+        console.log("Success uploading data: ", dataBucket);
+      }
+    });
   });
   socket.on('colorPick', function(data){
     io.emit('colorPick', { id: data.id });
