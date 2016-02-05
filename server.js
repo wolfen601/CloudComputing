@@ -58,6 +58,7 @@ io.on('connection', function (socket) {
         console.log("Success uploading data: ", dataBucket);
       }
     });
+    counter = counter + 1;
   });
   socket.on('colorPick', function(data){
     io.emit('colorPick', { id: data.id });
