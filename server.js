@@ -47,7 +47,8 @@ io.on('connection', function (socket) {
   socket.on('save', function(data){
     var params = {
       Key: "image" + counter + ".png",
-      Body: data.image,
+      Body: new Buffer(data.image.replace(/^data:image\/\w+;base64,/, ""),'base64'),
+      ContentEncoding: 'base64',
       ContentType: 'image/png',
       ACL: 'public-read'
     };
