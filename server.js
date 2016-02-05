@@ -7,9 +7,9 @@ var express = require('express'),
 var server = http.createServer(app);
 var io = socketIo.listen(server);
 var port = process.env.PORT || 8080;
-var accessKeyId =  process.env.AWS_ACCESS_KEY || "AKIAI5F5H7SX4T2D7P3Q";
-var secretAccessKey = process.env.AWS_SECRET_KEY || "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";
-var s3bucket = process.env.S3_BUCKET || "kevichino-cloud-computing";
+var accessKeyId =  process.env.AWS_ACCESS_KEY || "xx";
+var secretAccessKey = process.env.AWS_SECRET_KEY || "xx";
+var s3bucket = process.env.S3_BUCKET || "kevichino-cloud-x";
 
 
 aws.config.update({
