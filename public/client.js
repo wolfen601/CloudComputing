@@ -11,9 +11,9 @@ document.addEventListener("DOMContentLoaded", function() {
    var context = canvas.getContext('2d');
    var messageWindow = document.getElementById('messageWindow');
    messageWindow.style.display = 'none';
-   var canvasWidth   = window.innerWidth*(2/3) || 720;
+   var chatWidth   = 300;
+   var canvasWidth   = window.innerWidth - chatWidth - 100 || 720;
    var canvasHeight  = 720;
-   var chatWidth   = window.innerWidth*(1/3) || 240;
    var socket  = io.connect();
 
    //color picker
@@ -134,19 +134,23 @@ document.addEventListener("DOMContentLoaded", function() {
         var newMsg = document.createElement("P");
         var bold = document.createElement("b");
         var text = document.createTextNode(user + " has logged in.");
+        bold.appendChild(text);
         newMsg.appendChild(bold);
-        newMsg.appendChild(text);
         chat.appendChild(newMsg);
         document.getElementById("chats").appendChild(chat);
       }else if(id == 1){
         //message
         var chat = document.createElement("li");
+        chat.className = 'you';
+        if(user == username){
+          chat.className = 'me';
+        }
 
         var character = document.createElement("div");
         var bold = document.createElement("b");
-        var chrName = document.createTextNode(user + " : ");
+        var chrName = document.createTextNode(user);
+        bold.appendChild(chrName);
         character.appendChild(bold);
-        character.appendChild(chrName);
 
         var newMsg = document.createElement("P");
         var text = document.createTextNode(" " + msg);

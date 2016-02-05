@@ -65,7 +65,6 @@ io.on('connection', function (socket) {
     io.emit('colorPick', { id: data.id });
   });
   socket.on('login', function(data){
-    socket.username = data.id;
     socket.emit('login', { id: data.id } );
   });
   socket.on('sendMessage', function(data){
