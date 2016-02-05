@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function() {
    var messageWindow = document.getElementById('messageWindow');
    messageWindow.style.display = 'none';
    var chatWidth   = 300;
-   var canvasWidth   = window.innerWidth - chatWidth - 100 || 720;
+   var canvasWidth   = window.innerWidth - chatWidth - 20 || 720;
    var canvasHeight  = 720;
    var socket  = io.connect();
 
