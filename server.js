@@ -65,7 +65,7 @@ io.on('connection', function (socket) {
     io.emit('colorPick', { id: data.id });
   });
   socket.on('login', function(data){
-    socket.emit('login', { id: data.id } );
+    socket.emit('showMessage', { message: data.message } );
   });
   socket.on('sendMessage', function(data){
     messageHistory.push(data.message);

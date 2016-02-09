@@ -116,21 +116,16 @@ document.addEventListener("DOMContentLoaded", function() {
      var context = canvas.getContext('2d');
      context.strokeStyle=data.id;
     });
-    //new user
-    socket.on('login', function(data){
-      createMessage(0,data.id, "");
-    });
     //show message
     socket.on('showMessage', function(data){
-      createMessage(1,data.message[0], data.message[1]);
-    });
-
-    function createMessage(id, user, msg){
+      var id = data.message[0];
+      var user = data.message[1];
+      var msg = data.message[2];
       //check if login or message
       if(id == 0){
         //login
         var chat = document.createElement("li");
-
+        chat.className = 'system';
         var newMsg = document.createElement("P");
         var bold = document.createElement("b");
         var text = document.createTextNode(user + " has logged in.");
@@ -145,7 +140,6 @@ document.addEventListener("DOMContentLoaded", function() {
         if(user == username){
           chat.className = 'me';
         }
-
         var character = document.createElement("div");
         var bold = document.createElement("b");
         var chrName = document.createTextNode(user);
@@ -163,7 +157,7 @@ document.addEventListener("DOMContentLoaded", function() {
       $('#chatWindow').stop().animate({
         scrollTop: $("#chatWindow")[0].scrollHeight
       }, 800);
-    }
+    });
 
    // main loop, running every 25ms
    function mainLoop() {
@@ -186,13 +180,13 @@ document.addEventListener("DOMContentLoaded", function() {
        messageWindow.style.display = 'block';
        var loginScreen = document.getElementById('loginScreen');
        loginScreen.style.display = 'none';
-       socket.emit('login', {id: username});
+       socket.emit('login', { message: [ 0, username, "" ] });
      }
      if(sent == true){
        sent = false;
        var messageContent = document.getElementById('message');
        var msg = messageContent.value;
-       socket.emit('sendMessage', { message: [ username, msg ] });
+       socket.emit('sendMessage', { message: [ 1, username, msg ] });
      }
       // check if the user is drawing
       if (mouse.click && mouse.move && mouse.pos_prev) {
