@@ -1,3 +1,6 @@
+/* Author: Kevin Ho
+ * Client side operations in generating the visuals as well as functionality
+*/
 document.addEventListener("DOMContentLoaded", function() {
    var mouse = {
       click: false,
@@ -18,7 +21,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
    //color picker
    var colorPicker = document.getElementById('colorpicker');
-   var picked = false;
    var color = "#FF0000";
 
    //eraser
@@ -69,7 +71,6 @@ document.addEventListener("DOMContentLoaded", function() {
    };
 
    colorPicker.onclick = function(){
-     picked = true;
      var canvas  = document.getElementById('drawing');
      var context = canvas.getContext('2d');
      var randomColor;
@@ -109,12 +110,6 @@ document.addEventListener("DOMContentLoaded", function() {
       var canvas  = document.getElementById('drawing');
       var context = canvas.getContext('2d');
       context.clearRect(0, 0, canvas.width, canvas.height);
-    });
-    //random color picker
-    socket.on('colorPick', function (data) {
-     var canvas  = document.getElementById('drawing');
-     var context = canvas.getContext('2d');
-     context.strokeStyle=data.id;
     });
     //show message
     socket.on('showMessage', function(data){
@@ -165,10 +160,6 @@ document.addEventListener("DOMContentLoaded", function() {
      if(cleared == true){
        cleared = false;
        socket.emit('clear', {id: 'clear'});
-     }
-     if(picked == true){
-       picked = false;
-       socket.emit('colorPick', {id: color});
      }
      if(saved == true){
        saved = false;
